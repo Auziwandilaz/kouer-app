@@ -49,7 +49,6 @@ export default function MyInfo({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-<<<<<<< HEAD
   const handleLastNameChange = () => {
     // Code pour changer le nom de famille
   };
@@ -74,8 +73,6 @@ export default function MyInfo({ navigation }) {
     // Code pour changer le mot de passe
   };
 
-=======
->>>>>>> 70670d4 (18/04/2024)
   const handleSubmit = async () => {
     try {
       const { data, error } = await supabase.from("customer_address").insert([

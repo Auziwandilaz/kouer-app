@@ -39,10 +39,7 @@ import Auth from "./components/Auth";
 import GeneralProduct from "./views/general_product";
 import Regions from "./views/regions";
 import Vrac from "./views/vrac";
-<<<<<<< HEAD
 import Livraison from "./views/livraison";
-=======
->>>>>>> 70670d4 (18/04/2024)
 const Stack = createNativeStackNavigator();
 
 export default function App() {

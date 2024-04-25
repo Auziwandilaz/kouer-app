@@ -208,7 +208,6 @@ export default function Panier({ navigation }) {
                     >
                       {group[0].seller.seller_name}
                     </Text>
-<<<<<<< HEAD
 
                     <View>
                       <TouchableOpacity
@@ -222,98 +221,6 @@ export default function Panier({ navigation }) {
                             : "Afficher"}
                         </Text>
                       </TouchableOpacity>
-=======
-                  </View>
-
-                  {group.map((item, itemIndex) => (
-                    <View key={itemIndex} style={styles.item}>
-                      <View style={{ flexDirection: "row" }}>
-                        <Image
-                          source={{ uri: item.product.p_images[0] }}
-                          style={{ width: 80, height: 80, borderRadius: 10 }}
-                        />
-                        <Text
-                          style={{
-                            flexShrink: 1,
-                            color: "#505050",
-                            margin: 10,
-                          }}
-                          ellipsizeMode="tail"
-                        >
-                          {item.product.title}
-                        </Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          paddingVertical: 10,
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: 90,
-                            backgroundColor: "#E3E3E3",
-                            height: 30,
-                            borderRadius: 5,
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Picker
-                            selectedValue={item.quantity}
-                            onValueChange={(value) =>
-                              handleQuantityChange(
-                                item.sellerId2,
-                                itemIndex,
-                                value
-                              )
-                            }
-                          >
-                            {[...Array(100).keys()].map((value) => (
-                              <Picker.Item
-                                key={value}
-                                label={String(value)}
-                                value={value}
-                              />
-                            ))}
-                          </Picker>
-                        </View>
-                        <View>
-                          <View>
-                            <StarRating
-                              disabled={false}
-                              maxStars={5}
-                              rating={3 /*product.rating*/}
-                              starSize={12}
-                              fullStarColor={"gold"}
-                            />
-                            <Text>4 avis</Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text style={{ color: "#4EA04C", fontSize: 20 }}>
-                              {item.product.product_unit_price}€
-                            </Text>
-                            <Text
-                              style={{
-                                marginHorizontal: 10,
-                                color: "#AAAAAA",
-                                fontSize: 12,
-                              }}
-                            >
-                              /{item.product.starting_quantity}
-                              {item.product.unit_type}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
->>>>>>> 70670d4 (18/04/2024)
                     </View>
                   </View>
 
