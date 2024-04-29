@@ -16,35 +16,12 @@ import { supabase } from "../lib/supabase";
 import StarRating from "react-native-star-rating";
 import Footer from "./footer";
 import { SearchProvider, Search_bar } from "./search_bar";
+import { favorie } from "../components/fav";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
-export function Home({ navigation }) {
+export function Home({ navigation, route }) {
   const [searchValue, setSearchValue] = useState("");
-  const [topProducts, setTopProducts] = useState([]);
-
-  useEffect(() => {
-    fetchTopProducts();
-  }, []);
-
-  async function fetchTopProducts() {
-    const { data, error } = await supabase
-      .from("products")
-      .select(
-        "title,price, p_images, product_unit_price, starting_quantity, id, unit_type, seller_id, seller:seller_id(profile_img,region)"
-      )
-      .order("ventes", { ascending: false })
-      .limit(15);
-
-    if (error) {
-      console.error(
-        "Erreur lors de la récupération des produits les plus vendus :",
-        error
-      );
-      return;
-    }
-
-    setTopProducts(data);
-  }
+  const { topProducts } = route.params;
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ height: screenHeight * 1 }}>
@@ -222,6 +199,7 @@ export function Home({ navigation }) {
                                   borderRadius: 10,
                                 }}
                               />
+
                               <Image
                                 source={{ uri: product.seller.profile_img }}
                                 style={{
@@ -232,6 +210,22 @@ export function Home({ navigation }) {
                                   position: "absolute",
                                 }}
                               />
+                              <TouchableOpacity
+                                style={{
+                                  width: 34,
+                                  height: 31,
+                                  position: "absolute",
+                                  right: 5,
+                                  top: 5,
+                                }}
+                                onPress={() =>
+                                  favorie(product.id, product.seller_id)
+                                } // Passez l'objet produit à la fonction favorie
+                              >
+                                <Image
+                                  source={require("../assets/img/like.png")}
+                                />
+                              </TouchableOpacity>
                               <View
                                 style={{
                                   flexDirection: "row",

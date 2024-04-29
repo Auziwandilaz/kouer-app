@@ -19,17 +19,14 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 export default function MyInfo({ navigation }) {
   const [selectedButton, setSelectedButton] = useState("coordonnees");
   const [user, setUser] = useState(null);
-
   const [userId, setUserId] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [addressData, setAddressData] = useState(null);
   useEffect(() => {
     const sessionSubscription = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log("Session:", session);
         if (session) {
-          const userId = session.user.id;
-          console.log("User ID:", userId);
-          setUserId(userId);
           setUser(session.user);
         } else {
           setUser(null);
@@ -37,10 +34,44 @@ export default function MyInfo({ navigation }) {
         }
       }
     );
+
     return () => {
-      sessionSubscription;
+      if (typeof sessionSubscription.unsubscribe === "function") {
+        sessionSubscription.unsubscribe();
+      }
     };
   }, []);
+
+  useEffect(() => {
+    const sessionSubscription = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session) {
+          const { data, error } = await supabase
+            .from("customers")
+            .select("id, first_name, last_name, email, phone, birth_date")
+            .eq("user_id", session.user.id)
+            .single();
+
+          if (error) {
+            console.error("Erreur lors de la récupération du client :", error);
+          } else if (data) {
+            console.log("Customer ID:", data.id);
+            setUserId(data.id);
+            setUser(session.user);
+          }
+        } else {
+          setUser(null);
+          setUserId(null);
+        }
+      }
+    );
+
+    return () => {
+      if (typeof sessionSubscription.unsubscribe === "function") {
+        sessionSubscription.unsubscribe();
+      }
+    };
+  }, [userId]);
 
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
@@ -49,7 +80,72 @@ export default function MyInfo({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-<<<<<<< HEAD
+  useEffect(() => {
+    if (userId !== null) {
+      fetchData();
+    }
+  }, [userId]);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    if (userId === null) {
+      console.error("userId est null");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("customer_addresses")
+      .select("first_name, last_name, full_address")
+      .eq("customer_id", userId);
+
+    if (error) {
+      console.error(
+        "Erreur lors de la récupération des données de Supabase",
+        error
+      );
+      setError(error);
+    } else {
+      console.log("Données récupérées :", data);
+      setAddressData(data);
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      console.log("country:", country);
+      console.log("city:", city);
+      console.log("street:", street);
+      console.log("postalCode:", postalCode);
+      console.log("phoneNumber:", phoneNumber);
+      console.log("userId:", userId);
+      console.log("user:", user?.user_metadata.first_name);
+      const { data, error } = await supabase.from("customer_addresses").insert([
+        {
+          country: country,
+          city: city,
+          full_address: street,
+          zip_code: postalCode,
+          address_phone: phoneNumber,
+          customer_id: userId,
+          first_name: user?.user_metadata.first_name,
+          last_name: user?.user_metadata.last_name,
+          email: user?.email,
+        },
+      ]);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi des données à Supabase", error);
+    }
+    fetchData();
+  };
+
   const handleLastNameChange = () => {
     // Code pour changer le nom de famille
   };
@@ -73,32 +169,6 @@ export default function MyInfo({ navigation }) {
   const handlePasswordChange = () => {
     // Code pour changer le mot de passe
   };
-
-=======
->>>>>>> 70670d4 (18/04/2024)
-  const handleSubmit = async () => {
-    try {
-      const { data, error } = await supabase.from("customer_address").insert([
-        {
-          country: country,
-          city: city,
-          full_address: street,
-          zip_code: postalCode,
-          address_phone: phoneNumber,
-          customer_id: userId,
-        },
-      ]);
-
-      if (error) {
-        throw error;
-      }
-
-      console.log(data);
-    } catch (error) {
-      console.error("Erreur lors de l'envoi des données à Supabase", error);
-    }
-  };
-
   return (
     // recuperation des informations de l'utilisateur (nom, prenom, date de naissance, email, date d'inscription, etc.)
     <SafeAreaView style={{ flex: 1 }}>
@@ -336,9 +406,7 @@ export default function MyInfo({ navigation }) {
 
                       <View style={styles.card}>
                         <Text>Mot de passe :</Text>
-                        <Text style={{ color: "#AAAAAA" }}>
-                          {user?.user_metadata?.password}
-                        </Text>
+                        <Text style={{ color: "#AAAAAA" }}>***********</Text>
                         <View
                           style={{
                             flexDirection: "row",
@@ -361,53 +429,73 @@ export default function MyInfo({ navigation }) {
                   )}
                   {selectedButton === "adresses" && (
                     <View>
-                      <View style={styles.card}>
-                        <Text style={styles.title}>Adresse 1</Text>
-                        <Text>Nom Prénom</Text>
-                        <Text>14 rue Gérard Lavoix</Text>
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <Text>Adresse de livraison</Text>
-                        </View>
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <Text>Adresse de facturation</Text>
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => {
-                              /* Votre fonction de modification ici */
-                            }}
-                            style={styles.touch}
-                          >
-                            <Text
-                              style={{ textAlign: "center", color: "white" }}
-                            >
-                              Modifier
+                      {addressData &&
+                        addressData.length > 0 &&
+                        addressData.map((address, index) => (
+                          <View style={styles.card} key={index}>
+                            <Text style={styles.title}>
+                              Adresse {index + 1}
                             </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => {
-                              /* Votre fonction de suppression ici */
-                            }}
-                            style={styles.touch}
-                          >
-                            <Text
-                              style={{ textAlign: "center", color: "white" }}
-                            >
-                              Supprimer
+                            <Text>
+                              {addressData[0].first_name}{" "}
+                              {addressData[0].last_name}
                             </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
+                            <Text>{addressData[0].full_address}</Text>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text>Adresse de livraison</Text>
+                            </View>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text>Adresse de facturation</Text>
+                            </View>
+                            <View
+                              style={{
+                                flexDirection: "column",
+                                justifyContent: "flex-end",
+                              }}
+                            >
+                              <TouchableOpacity
+                                onPress={() => {
+                                  /* Votre fonction de modification ici */
+                                }}
+                                style={styles.touch}
+                              >
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "white",
+                                  }}
+                                >
+                                  Modifier
+                                </Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  /* Votre fonction de suppression ici */
+                                }}
+                                style={styles.touch}
+                              >
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "white",
+                                  }}
+                                >
+                                  Supprimer
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        ))}
                       <View>
                         <View>
                           {showForm && (

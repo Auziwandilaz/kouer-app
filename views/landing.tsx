@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   Dimensions,
@@ -10,9 +10,38 @@ import {
   View,
 } from "react-native";
 
+import { supabase } from "../lib/supabase";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 export default function Landing({ navigation }) {
+  const [topProducts, setTopProducts] = useState([]);
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 15;
+
+  async function fetchTopProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select(
+        "title,price, p_images, product_unit_price, starting_quantity, id, unit_type, seller_id, seller:seller_id(profile_img,region)"
+      )
+      .order("ventes", { ascending: false })
+      .range(page * itemsPerPage, (page + 1) * itemsPerPage - 1);
+
+    if (error) {
+      console.error(
+        "Erreur lors de la récupération des produits les plus vendus :",
+        error
+      );
+      return;
+    }
+
+    setTopProducts((prevProducts) => [...prevProducts, ...data]);
+  }
+
+  useEffect(() => {
+    fetchTopProducts().then(() => {});
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <LinearGradient
@@ -77,7 +106,7 @@ export default function Landing({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Home"); //MainSearch //Explanations
+              navigation.navigate("Home", { topProducts });
             }}
             style={{ alignItems: "center", width: "100%" }}
           >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
@@ -11,9 +11,28 @@ import {
   ScrollView,
 } from "react-native";
 import { Footer } from "./footer";
+import { fetchProductAndSellerInfo } from "../components/fav";
+
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
-export default function MyFavorite({ navigation }) {
+export default function MyFavorite({ navigation, sellerId }) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetchProductAndSellerInfo().then((fetchedData) => {
+      const groupedData = fetchedData.reduce((acc, item) => {
+        const sellerId = item.sellerData[0]?.id;
+        if (!acc[sellerId]) {
+          acc[sellerId] = [];
+        }
+        acc[sellerId].push(item);
+        return acc;
+      }, {});
+      setData(groupedData);
+      console.log(groupedData);
+    });
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <LinearGradient
@@ -54,1587 +73,235 @@ export default function MyFavorite({ navigation }) {
           <View
             style={{
               marginBottom: screenHeight * 0.3,
-              backgroundColor: "#F5F5F5",
+
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            {/* Producteur card */}
-            {/* a repeter */}
             <View
               style={{
-                backgroundColor: "#fff",
                 borderRadius: 20,
                 width: screenWidth * 0.95,
                 marginBottom: 20,
               }}
             >
               <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 10,
-                  }}
-                >
-                  <Image
-                    source={require("../assets/img/tracteur.png")}
-                    style={{ width: 70, height: 70, borderRadius: 10 }}
-                  />
-                  <Text
-                    style={{ marginLeft: 10, fontSize: 15, color: "#4EA04C" }}
-                  >
-                    La vieille ferme de {"\n"}Croissanville
-                  </Text>
-                </View>
-
-                <ScrollView
-                  horizontal={true}
-                  style={{}}
-                  showsHorizontalScrollIndicator={false}
-                >
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
+                {data &&
+                  Object.keys(data).map((sellerId) => (
                     <View
+                      key={sellerId}
                       style={{
-                        flexDirection: "column",
+                        marginBottom: 15,
+                        backgroundColor: "#fff",
+                        borderRadius: 20,
                       }}
                     >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
+                      {data[sellerId][0]?.sellerData && (
                         <View
                           style={{
-                            flexDirection: "column",
+                            flexDirection: "row",
+                            alignItems: "center",
                             padding: 10,
                           }}
                         >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
+                          <Image
+                            source={{
+                              uri: data[sellerId][0]?.sellerData[0]
+                                ?.profile_img,
+                            }}
                             style={{
-                              flexDirection: "row",
+                              width: 70,
+                              height: 70,
+                              borderRadius: 10,
+                            }}
+                          />
+                          <Text
+                            style={{
+                              marginLeft: 10,
+                              fontSize: 15,
+                              color: "#4EA04C",
                             }}
                           >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
+                            {data[sellerId][0]?.sellerData[0]?.seller_name}
+                          </Text>
                         </View>
+                      )}
 
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
+                      <ScrollView
+                        horizontal={true}
+                        style={{}}
+                        showsHorizontalScrollIndicator={false}
                       >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
+                        {data[sellerId].map((item, index) => {
+                          return (
+                            <TouchableOpacity
+                              key={index}
+                              onPress={() =>
+                                navigation.navigate("Produit", {
+                                  productId: item.productData[0]?.id,
+                                })
+                              }
+                              style={{
+                                borderRadius: 10,
+                                width: screenWidth * 0.35,
 
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
+                                margin: 10,
+                              }}
+                            >
+                              <View
+                                style={{
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <View
+                                  style={{
+                                    borderRadius: 10,
+                                    height: 100,
+                                    width: "100%",
+                                  }}
+                                >
+                                  <Image
+                                    source={{
+                                      uri: item.productData[0]?.p_images?.[0],
+                                    }}
+                                    style={{
+                                      height: "100%",
+                                      width: "100%",
+                                      borderRadius: 10,
+                                    }}
+                                  />
+                                  <Image
+                                    source={require("../assets/img/top_left_card.png")}
+                                    style={{
+                                      width: 30,
+                                      height: 30,
+                                      position: "absolute",
+                                    }}
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    paddingHorizontal: 10,
+                                  }}
+                                >
+                                  <Text>{item.productData[0]?.title}</Text>
+                                </View>
+
+                                <View
+                                  style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <View
+                                    style={{
+                                      flexDirection: "column",
+                                      padding: 10,
+                                    }}
+                                  >
+                                    <View style={{ paddingVertical: 10 }}>
+                                      <Text style={{ color: "#4EA04C" }}>
+                                        {item.productData[0]?.price}€ /
+                                        {item.productData[0]?.unit_type}
+                                      </Text>
+                                    </View>
+
+                                    <View
+                                      style={{
+                                        flexDirection: "row",
+                                      }}
+                                    >
+                                      <Image
+                                        source={require("../assets/img/stars.png")}
+                                        style={{
+                                          width: screenWidth * 0.03,
+                                          height: screenHeight * 0.015,
+                                        }}
+                                      />
+                                      <Image
+                                        source={require("../assets/img/stars.png")}
+                                        style={{
+                                          width: screenWidth * 0.03,
+                                          height: screenHeight * 0.015,
+                                        }}
+                                      />
+                                      <Image
+                                        source={require("../assets/img/stars.png")}
+                                        style={{
+                                          width: screenWidth * 0.03,
+                                          height: screenHeight * 0.015,
+                                        }}
+                                      />
+                                      <Image
+                                        source={require("../assets/img/stars.png")}
+                                        style={{
+                                          width: screenWidth * 0.03,
+                                          height: screenHeight * 0.015,
+                                        }}
+                                      />
+                                    </View>
+                                    <View>
+                                      <Text
+                                        style={{
+                                          fontSize: 9,
+                                          color: "#AAAAAA",
+                                        }}
+                                      >
+                                        39 avis
+                                      </Text>
+                                    </View>
+                                  </View>
+
+                                  <Image
+                                    source={require("../assets/img/shop.png")}
+                                    style={{
+                                      width: 30,
+                                      height: 30,
+                                      position: "absolute",
+                                      right: 5,
+                                      bottom: 5,
+                                    }}
+                                  />
+                                </View>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </ScrollView>
+
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("Producteur", {
+                            sellerId: sellerId,
+                          })
+                        }
                       >
                         <View
                           style={{
-                            flexDirection: "column",
+                            flexDirection: "row",
+                            alignItems: "center",
                             padding: 10,
+                            justifyContent: "center",
                           }}
                         >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
+                          <Text
                             style={{
-                              flexDirection: "row",
+                              textDecorationLine: "underline",
+                              color: "#1B4D3E",
                             }}
                           >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
+                            Aller sur la page du producteur
+                          </Text>
+                          <Image
+                            source={require("../assets/img/right_arrow.png")}
+                            style={{ width: 15, height: 12, marginLeft: 5 }}
+                          />
                         </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
+                      </TouchableOpacity>
                     </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Producteur")}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 10,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        textDecorationLine: "underline",
-                        color: "#1B4D3E",
-                      }}
-                    >
-                      Aller sur la page du producteur
-                    </Text>
-                    <Image
-                      source={require("../assets/img/right_arrow.png")}
-                      style={{ width: 15, height: 12, marginLeft: 5 }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 20,
-                width: screenWidth * 0.95,
-                marginBottom: 20,
-              }}
-            >
-              <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 10,
-                  }}
-                >
-                  <Image
-                    source={require("../assets/img/tracteur.png")}
-                    style={{ width: 70, height: 70, borderRadius: 10 }}
-                  />
-                  <Text
-                    style={{ marginLeft: 10, fontSize: 15, color: "#4EA04C" }}
-                  >
-                    La vieille ferme de {"\n"}Croissanville
-                  </Text>
-                </View>
-
-                <ScrollView
-                  horizontal={true}
-                  style={{}}
-                  showsHorizontalScrollIndicator={false}
-                >
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Producteur")}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 10,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        textDecorationLine: "underline",
-                        color: "#1B4D3E",
-                      }}
-                    >
-                      Aller sur la page du producteur
-                    </Text>
-                    <Image
-                      source={require("../assets/img/right_arrow.png")}
-                      style={{ width: 15, height: 12, marginLeft: 5 }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 20,
-                width: screenWidth * 0.95,
-                marginBottom: 20,
-              }}
-            >
-              <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 10,
-                  }}
-                >
-                  <Image
-                    source={require("../assets/img/tracteur.png")}
-                    style={{ width: 70, height: 70, borderRadius: 10 }}
-                  />
-                  <Text
-                    style={{ marginLeft: 10, fontSize: 15, color: "#4EA04C" }}
-                  >
-                    La vieille ferme de {"\n"}Croissanville
-                  </Text>
-                </View>
-
-                <ScrollView
-                  horizontal={true}
-                  style={{}}
-                  showsHorizontalScrollIndicator={false}
-                >
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      width: screenWidth * 0.35,
-
-                      margin: 10,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "column",
-                      }}
-                    >
-                      <View
-                        style={{
-                          borderRadius: 10,
-                          height: 100,
-                          width: "100%",
-                        }}
-                      >
-                        <Image
-                          source={require("../assets/img/limonade.png")}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-                          }}
-                        />
-                        <Image
-                          source={require("../assets/img/top_left_card.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                          }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        <Text>Limonade</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            padding: 10,
-                          }}
-                        >
-                          <View style={{ paddingVertical: 10 }}>
-                            <Text style={{ color: "#4EA04C" }}>3.70€</Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                            <Image
-                              source={require("../assets/img/stars.png")}
-                              style={{
-                                width: screenWidth * 0.03,
-                                height: screenHeight * 0.015,
-                              }}
-                            />
-                          </View>
-                          <View>
-                            <Text style={{ fontSize: 9, color: "#AAAAAA" }}>
-                              39 avis
-                            </Text>
-                          </View>
-                        </View>
-
-                        <Image
-                          source={require("../assets/img/shop.png")}
-                          style={{
-                            width: 30,
-                            height: 30,
-                            position: "absolute",
-                            right: 5,
-                            bottom: 5,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Producteur")}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 10,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        textDecorationLine: "underline",
-                        color: "#1B4D3E",
-                      }}
-                    >
-                      Aller sur la page du producteur
-                    </Text>
-                    <Image
-                      source={require("../assets/img/right_arrow.png")}
-                      style={{ width: 15, height: 12, marginLeft: 5 }}
-                    />
-                  </View>
-                </TouchableOpacity>
+                  ))}
               </View>
             </View>
           </View>
