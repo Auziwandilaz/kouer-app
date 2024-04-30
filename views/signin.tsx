@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Alert,
   AppState,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,6 +31,35 @@ export default function Signin({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
+  const [topProducts, setTopProducts] = useState([]);
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 15;
+
+  async function fetchTopProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select(
+        "title,price, p_images, product_unit_price, starting_quantity, id, unit_type, seller_id, seller:seller_id(profile_img,region)"
+      )
+      .order("ventes", { ascending: false })
+      .range(page * itemsPerPage, (page + 1) * itemsPerPage - 1);
+
+    if (error) {
+      console.error(
+        "Erreur lors de la récupération des produits les plus vendus :",
+        error
+      );
+      return;
+    }
+
+    setTopProducts((prevProducts) => [...prevProducts, ...data]);
+  }
+
+  useEffect(() => {
+    fetchTopProducts().then(() => {});
+  }, []);
   return (
     <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
       <View
@@ -87,26 +115,32 @@ export default function Signin({ navigation }) {
         <Input
           label="Email"
           leftIcon={{ type: "font-awesome", name: "envelope" }}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) => setEmail(text.replace(/\s/g, ""))}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
         />
-        <Input
-          label="Password"
-          leftIcon={{ type: "font-awesome", name: "lock" }}
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={!showPassword}
-          placeholder="Password"
-          autoCapitalize={"none"}
-        />
-        <Icon
-          name={showPassword ? "eye-slash" : "eye"}
-          size={10}
-          color="black"
-          onPress={() => setShowPassword(!showPassword)}
-        />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Input
+            label="Password"
+            leftIcon={{ type: "font-awesome", name: "lock" }}
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+            secureTextEntry={!showPassword}
+            placeholder="Password"
+            autoCapitalize={"none"}
+          />
+          <TouchableOpacity
+            style={{ position: "absolute", right: 10, zIndex: 9999 }}
+          >
+            <Icon
+              name={showPassword ? "eye-slash" : "eye"}
+              size={20}
+              color="black"
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          </TouchableOpacity>
+        </View>
         <LinearGradient
           colors={["#A4DF75", "#4EA04C"]}
           start={{ x: -0.25, y: -0.25 }}

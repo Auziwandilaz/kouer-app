@@ -21,7 +21,82 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 export function Home({ navigation, route }) {
   const [searchValue, setSearchValue] = useState("");
-  const { topProducts } = route.params;
+  const [topProducts, setTopProducts] = useState([]);
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 15;
+
+  async function fetchTopProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select(
+        "title,price, p_images, product_unit_price, starting_quantity, id, unit_type, seller_id, seller:seller_id(profile_img,region)"
+      )
+      .order("ventes", { ascending: false })
+      .range(page * itemsPerPage, (page + 1) * itemsPerPage - 1);
+
+    if (error) {
+      console.error(
+        "Erreur lors de la récupération des produits les plus vendus :",
+        error
+      );
+      return;
+    }
+
+    setTopProducts((prevProducts) => [...prevProducts, ...data]);
+  }
+
+  useEffect(() => {
+    fetchTopProducts().then(() => {});
+  }, []);
+
+  async function fetchProductIds() {
+    const productNames = [
+      "Sorbet Poire 0.5L",
+      "Glace aux Oeufs Vanille Bourbon 0.5L",
+      "Glace aux Oeufs Chocolat Weiss 0.5L",
+      "Sorbet Ananas 1L",
+      "Crème Glaçée Pistache 0.5L",
+      "Crème Glaçée Caramel Beurre Salé 0.5L",
+      "Crème Glaçée Noisette 0.5L",
+      "Sorbet Mangue 1L",
+      "Glace aux Oeufs Rhum Raisin 0.5L",
+      "Crème Glaçée Stracciatella 1L",
+      "Sorbet Mandarine 0.5L",
+      "Sorbet Fraise Gariguette 0.5L",
+      "Glace aux Oeufs Vanille Eclat de Chocolat 1L",
+    ];
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, title")
+      .in("title", productNames);
+
+    if (error) {
+      console.error(
+        "Erreur lors de la récupération des ID de produits :",
+        error
+      );
+      return;
+    }
+
+    // data est un tableau d'objets, chaque objet contenant l'ID et le titre d'un produit
+    console.log("Produits :", data);
+    return data;
+  }
+
+  useEffect(() => {
+    fetchProductIds()
+      .then((products) => {
+        console.log("Produits :", products);
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur lors de la récupération des ID de produits :",
+          error
+        );
+      });
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ height: screenHeight * 1 }}>

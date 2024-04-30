@@ -183,7 +183,7 @@ export default function Panier({ navigation }) {
         ) : (
           <View>
             <ScrollView>
-              <View style={{ marginBottom: screenHeight * 0.2 }}>
+              <View style={{ marginBottom: screenHeight * 0.3 }}>
                 {Object.values(
                   cart.reduce((groups, item) => {
                     const key = item.sellerId2;
@@ -379,48 +379,46 @@ export default function Panier({ navigation }) {
                 ))}
               </View>
             </ScrollView>
-            <View
-              style={{
-                position: "absolute",
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                height: 100,
-                backgroundColor: "#fff",
-                padding: 10,
-                borderTopEndRadius: 50,
-                borderTopStartRadius: 50,
-              }}
-            >
-              {/* Afficher le prix total */}
-              <Text
-                style={{ color: "#505050", fontSize: 15, paddingVertical: 5 }}
-              >
-                Total : {totalPrice} €
-              </Text>
-
-              {/* Bouton pour passer la commande */}
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Livraison")}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  backgroundColor: "#EEBA00",
-                  padding: 10,
-                  borderRadius: 999,
-                  width: "80%",
-                }}
-              >
-                <Text style={{ color: "#505050", fontSize: 15 }}>
-                  Passer la commande
-                </Text>
-                <Image source={require("../assets/img/fleche_cart.png")} />
-              </TouchableOpacity>
-            </View>
           </View>
         )}
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          height: 100,
+          backgroundColor: "#fff",
+          padding: 10,
+          borderTopEndRadius: 50,
+          borderTopStartRadius: 50,
+        }}
+      >
+        {/* Afficher le prix total */}
+        <Text style={{ color: "#505050", fontSize: 15, paddingVertical: 5 }}>
+          Total : {totalPrice} €
+        </Text>
+
+        {/* Bouton pour passer la commande */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Livraison")}
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: "#EEBA00",
+            padding: 10,
+            borderRadius: 999,
+            width: "80%",
+          }}
+        >
+          <Text style={{ color: "#505050", fontSize: 15 }}>
+            Passer la commande
+          </Text>
+          <Image source={require("../assets/img/fleche_cart.png")} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
